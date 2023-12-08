@@ -101,15 +101,11 @@ Process all of the original and copied scratchcards until no more scratchcards a
 """
 
 def probLogicP2(cards: dict) -> int:
-    original = cards.keys()
-    copies = []
-    copies_of_copies = []
-    for i in original:
+    num = [[1, i] for i in cards.keys()]
+    for ind, i in enumerate(cards.keys()):
         for j in range(1, findingNumOfSame(cards[i][0], cards[i][1])+1):
-            copies.append(f"Card {int(i.split(' ')[1]) + j}")
-    for i in copies:
-        for j in range(1, findingNumOfSame(cards[i][0], cards[i][1])+1):
-            copies_of_copies.append(f"Card {int(i.split(' ')[1]) + j}")
-    print(original)
-    print(copies)
-    return len(original) + len(copies) + len(copies_of_copies)
+            num[ind+j][0] += num[ind][0]
+    count = 0
+    for i in num:
+        count += i[0]
+    return count
