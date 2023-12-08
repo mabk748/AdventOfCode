@@ -109,3 +109,5 @@ def probLogicP2(cards: dict) -> int:
     for i in num:
         count += i[0]
     return count
+
+print(probLogicP2(turnToDict(inp)))
