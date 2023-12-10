@@ -1,3 +1,5 @@
+# NOT WORKING
+
 with open("inpd3.txt") as f:
     lines = [word.replace('\n', '') for word in f.readlines()]
 

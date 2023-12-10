@@ -40,3 +40,26 @@ def test_gameLogic():
             "...$.*....",
             ".664.598.."]
     assert gameLogic(test) == 4361
+
+#---------------------------Part 2---------------------------
+
+def test_findingStars():
+    test = inlargingInp(["467..114..",
+                        "...*......",
+                        "..35..633."])
+    assert findingStars(test) == [(2, 4)]
+
+def test_fillingTempMat9el():
+    test = inlargingInp(["467..114..",
+                        "...*......",
+                        "..35..633."])
+    assert fillingTempMat9el(test, (2,4)) == [[*"7.."], [*".*."], [*"35."]]
+
+def test_comparingInd():
+    assert comparingInd([(0, 1), (2, 0)], 0) == True
+    assert comparingInd([(0, 1), (2, 0)], 1) == False
+
+def test_areThereNumbers():
+    assert areThereNumbers([[*"7.."], [*".*."], [*"35."]]) == True
+    assert areThereNumbers([[*"..."], [*".*."], [*"..."]]) == False
+
