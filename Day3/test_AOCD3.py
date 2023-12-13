@@ -45,15 +45,19 @@ def test_gameLogic():
 
 def test_findingStars():
     test = inlargingInp(["467..114..",
-                        "...*......",
-                        "..35..633."])
+                         "...*......",
+                         "..35..633."])
     assert findingStars(test) == [(2, 4)]
 
-def test_fillingTempMat9el():
+def test_fillingTempMatP2():
     test = inlargingInp(["467..114..",
                         "...*......",
                         "..35..633."])
-    assert fillingTempMat9el(test, (2,4)) == [[*"7.."], [*".*."], [*"35."]]
+    test2 = inlargingInp(['484..969.', 
+                          '.&....*..', 
+                          '...258...'])
+    assert fillingTempMatP2(test, (2,4)) == ([[*"7.."], [*".*."], [*"35."]], [(1, 3), (3, 3), (3, 4)])
+    assert fillingTempMatP2(test2, (2, 7)) == ([['9', '6', '9'], ['.', '*', '.'], ['8', '.', '.']], [(1, 6), (1, 7), (1, 8), (3, 6)])
 
 def test_comparingInd():
     assert comparingInd([(0, 1), (2, 0)], 0) == True
@@ -63,3 +67,19 @@ def test_areThereNumbers():
     assert areThereNumbers([[*"7.."], [*".*."], [*"35."]]) == True
     assert areThereNumbers([[*"..."], [*".*."], [*"..."]]) == False
 
+def test_gettingNumbers():
+    assert gettingNumbers([[*"467.."], [*"...*."], [*"..35."]], [(0, 2), (2, 2)]) == [467, 35]
+    assert gettingNumbers([[*"..755."], [*".*...."], [*".598.."]], [(0, 3), (2, 1)]) == [755, 598]
+
+def test_gameLogicP2():
+    test = ["467..114..",
+           "...*......",
+           "..35..633.",
+           "......#...",
+           "617*......",
+           ".....+.58.",
+           "..592.....",
+           "......755.",
+           "...$.*....",
+           ".664.598.."]
+    assert gameLogicP2(test) == 467835

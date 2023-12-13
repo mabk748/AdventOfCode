@@ -127,6 +127,7 @@ In this schematic, there are two gears. The first is in the top left; it has par
 
 What is the sum of all of the gear ratios in your engine schematic?
 """
+import math
 
 def findingStars(mat: list[list[str]]) -> list:
     indexes = []
@@ -136,14 +137,57 @@ def findingStars(mat: list[list[str]]) -> list:
                 indexes.append((i, j))
     return indexes
 
-def fillingTempMat9el(mat: list[list[str]], indexes: tuple[int, int]) -> list[list[str]]:
+def fillingTempMatP2(mat: list[list[str]], indexes: tuple[int, int]) -> list[list[str]]:
     temp = [[], [], []]
+    num_ind = []
     for i in [-1, 0, 1]:
         temp[0].append(mat[indexes[0] - 1][indexes[1] + i])
+        if mat[indexes[0] - 1][indexes[1] + i] in NUMBERS:
+            num_ind.append((indexes[0] - 1, indexes[1] + i))
         temp[1].append(mat[indexes[0]][indexes[1] + i])
+        if mat[indexes[0]][indexes[1] + i] in NUMBERS:
+            num_ind.append((indexes[0], indexes[1] + i))
         temp[2].append(mat[indexes[0] + 1][indexes[1] + i])
-    print(temp)
-    return temp
+        if mat[indexes[0] + 1][indexes[1] + i] in NUMBERS:
+            num_ind.append((indexes[0] + 1, indexes[1] + i))
+    num_ind.sort(key=lambda x: x[0])
+
+    """ st1, st2, st3 = False, False, False
+    for i in range(indexes[1] + 2, len(mat[0])):
+        #print(temp)
+        if mat[indexes[0] - 1][i] in NUMBERS and mat[indexes[0] - 1][i - 1] in NUMBERS:
+            temp[0].append(mat[indexes[0] - 1][i])
+        else:
+            st1 = True
+        if mat[indexes[0]][i] in NUMBERS and mat[indexes[0]][i - 1] in NUMBERS:
+            temp[1].append(mat[indexes[0]][i])
+        else:
+            st2 = True
+        if mat[indexes[0] + 1][i] in NUMBERS and mat[indexes[0] + 1][i - 1] in NUMBERS:
+            temp[2].append(mat[indexes[0] + 1][i])
+        else:
+            st3 = True
+        if st1 and st2 and st3:
+            break
+    
+    st1, st2, st3 = False, False, False
+    for i in range(indexes[1] - 2, -1, -1):
+        #print(temp)
+        if mat[indexes[0] - 1][i] in NUMBERS and mat[indexes[0] - 1][i + 1] in NUMBERS:
+            temp[0].insert(0, mat[indexes[0] - 1][i])
+        else:
+            st1 = True
+        if mat[indexes[0]][i] in NUMBERS and mat[indexes[0]][i + 1] in NUMBERS:
+            temp[1].insert(0, mat[indexes[0]][i])
+        else:
+            st2 = True
+        if mat[indexes[0] + 1][i] in NUMBERS and mat[indexes[0] + 1][i + 1] in NUMBERS:
+            temp[2].insert(0, mat[indexes[0] + 1][i])
+        else:
+            st3 = True
+        if st1 and st2 and st3:
+            break """
+    return (temp, num_ind)
 
 def comparingInd(l: list[tuple], el: int) -> bool:
     for i in l:
@@ -164,5 +208,40 @@ def areThereNumbers(mat: list[list[str]]) -> bool:
             isIt = True
     return isIt
 
-def gettingNumbers(mat: list[list]) -> list:
-    pass
+def gettingNumbers(mat: list[str], ind: list[tuple]) -> str:
+    data = [[*i] for i in mat]
+    nums = []
+    for i in ind:
+        print(i)
+        num = data[i[0]][i[1]]
+        r = 1
+        l = -1
+        for _ in range(len(data[0])):
+            if data[i[0]][i[1] + r] in NUMBERS:
+                num += data[i[0]][i[1] + r]
+                r += 1
+            elif data[i[0]][i[1] + l] in NUMBERS:
+                num = data[i[0]][i[1] + l] + num
+                l -= 1
+            else:
+                if int(num) not in nums:
+                    nums.append(int(num))
+                break
+    return nums
+
+def gameLogicP2(inp: list[str]) -> int:
+    mat = inlargingInp(inp)
+    stars = findingStars(mat)
+    savedNums = []
+    for i in stars:
+        temp = fillingTempMatP2(mat, i)
+        #print(temp)
+        if areThereNumbers(temp[0]):
+            nums = gettingNumbers(mat, temp[1])
+            if len(nums) == 2:
+                #print(gettingNumbers(mat, temp[1]))
+                savedNums.append(math.prod(nums))
+        #print("-------------------")
+    return sum(savedNums)
+
+print(gameLogicP2(lines))
