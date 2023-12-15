@@ -53,3 +53,190 @@ Now, you can determine the total winnings of this set of hands by adding up the 
 
 Find the rank of every hand in your set. What are the total winnings?
 """
+
+with open("inpD7.txt") as f:
+    hands = [line.replace("\n", "") for line in f.readlines()]
+
+CARDS_POWER = {
+    "A" : 14, 
+    "K" : 13,
+    "Q" : 12,
+    "J" : 11,
+    "T" : 10,
+    "9" : 9,
+    "8" : 8,
+    "7" : 7,
+    "6" : 6,
+    "5" : 5,
+    "4" : 4,
+    "3" : 3,
+    "2" : 2
+}
+
+COMBINE_POWER = {
+    "Five of a kind": 7,
+    "Four of a kind": 6,
+    "Full house": 5,
+    "Three of a kind": 4,
+    "Two pair": 3,
+    "One pair": 2,
+    "High card": 1
+}
+
+def whereInHand(hand: str) -> dict:
+    cards = {}
+    for idx, v in enumerate([*hand]):
+        if v not in cards.keys():
+            cards[v] = []
+        cards[v].append(idx)
+    return cards
+
+def defineCombines(inp: dict) -> dict:
+    combines = {
+        "Five of a kind": False,
+        "Four of a kind": False,
+        "Full house": False,
+        "Three of a kind": False,
+        "Two pair": False,
+        "One pair": False,
+        "High card": False
+    }
+    areThereComb = False
+    for k in inp.keys():
+        if len(inp[k]) == 3 and combines["One pair"] == True:
+            combines["Full house"] = True
+            combines["One pair"] = False
+            areThereComb = True
+        elif len(inp[k]) == 2 and combines["Three of a kind"] == True:
+            combines["Full house"] = True
+            combines["Three of a kind"] = False
+            areThereComb = True
+        elif len(inp[k]) == 2 and combines["One pair"] == True:
+            combines["Two pair"] = True
+            combines["One pair"] = False
+            areThereComb = True
+        elif len(inp[k]) == 5:
+            combines["Five of a kind"] = True
+            areThereComb = True
+        elif len(inp[k]) == 4:
+            combines["Four of a kind"] = True
+            areThereComb = True
+        elif len(inp[k]) == 3:
+            combines["Three of a kind"] = True
+            areThereComb = True
+        elif len(inp[k]) == 2:
+            combines["One pair"] = True
+            areThereComb = True
+    if areThereComb == False:
+        combines["High card"] = True
+    whichOne = ""
+    for k in combines.keys():
+        if combines[k] == True:
+            whichOne = k
+    return whichOne
+
+def strongerHand(hand1: str, hand2: str) -> str:
+    combsh1 = defineCombines(whereInHand(hand1))
+    combsh2 = defineCombines(whereInHand(hand2))
+    if COMBINE_POWER[combsh1] > COMBINE_POWER[combsh2]:
+        return hand1
+    elif COMBINE_POWER[combsh1] < COMBINE_POWER[combsh2]:
+        return hand2
+    else:
+        for (a, b) in zip([*hand1], [*hand2]):
+            if CARDS_POWER[a] == CARDS_POWER[b]:
+                continue
+            elif CARDS_POWER[a] > CARDS_POWER[b]:
+                return hand1
+            elif CARDS_POWER[a] < CARDS_POWER[b]:
+                return hand2
+            
+def gameLogic(inp: list) -> int:
+    score = 0
+    for i in inp:
+        won = 0
+        for j in inp:
+            if strongerHand(i.split(" ")[0], j.split(" ")[0]) == i.split(" ")[0]:
+                won += 1
+        score += int(i.split(" ")[1]) * (won + 1)
+    return score
+
+#print(gameLogic(hands))
+
+#---------------------------Part 2---------------------------
+
+"""
+To make things a little more interesting, the Elf introduces one additional rule. Now, J cards are jokers - wildcards that can act like whatever card would make the hand the strongest type possible.
+
+To balance this, J cards are now the weakest individual cards, weaker even than 2. The other cards stay in the same order: A, K, Q, T, 9, 8, 7, 6, 5, 4, 3, 2, J.
+
+J cards can pretend to be whatever card is best for the purpose of determining hand type; for example, QJJQ2 is now considered four of a kind. However, for the purpose of breaking ties between two hands of the same type, J is always treated as J, not the card it's pretending to be: JKKK2 is weaker than QQQQ2 because J is weaker than Q.
+
+Now, the above example goes very differently:
+
+32T3K 765
+T55J5 684
+KK677 28
+KTJJT 220def whereInHand(hand: str) -> dict:
+    cards = {}
+    for idx, v in enumerate([*hand]):
+        if v not in cards.keys():
+            cards[v] = []
+        cards[v].append(idx)
+    return cards
+QQQJA 483
+
+    32T3K is still the only one pair; it doesn't contain any jokers, so its strength doesn't increase.
+    KK677 is now the only two pair, making it the second-weakest hand.
+    T55J5, KTJJT, and QQQJA are now all four of a kind! T55J5 gets rank 3, QQQJA gets rank 4, and KTJJT gets rank 5.
+
+With the new joker rule, the total winnings in this example are 5905.
+
+Using the new joker rule, find the rank of every hand in your set. What are the new total winnings?
+"""
+
+def whereInHandP2(hand: str) -> dict:
+    jokers = []
+    cards = {}
+    for idx, v in enumerate([*hand]):
+        if v == "J":
+            jokers.append(idx)
+        else:
+            if v not in cards.keys() and v != "J":
+                cards[v] = []
+            cards[v].append(idx)
+    if 0 < len(jokers) < len([*hand]):
+        #print(hand)
+        max_key = max(cards, key= lambda x: len(cards[x]))
+        cards[max_key] += jokers
+    elif len(jokers) == len([*hand]):
+        cards["J"] = jokers
+    return cards
+
+def strongerHandP2(hand1: str, hand2: str) -> str:
+    combsh1 = defineCombines(whereInHandP2(hand1))
+    combsh2 = defineCombines(whereInHandP2(hand2))
+    if COMBINE_POWER[combsh1] > COMBINE_POWER[combsh2]:
+        return hand1
+    elif COMBINE_POWER[combsh1] < COMBINE_POWER[combsh2]:
+        return hand2
+    else:
+        for (a, b) in zip([*hand1], [*hand2]):
+            if CARDS_POWER[a] == CARDS_POWER[b]:
+                continue
+            elif CARDS_POWER[a] > CARDS_POWER[b]:
+                return hand1
+            elif CARDS_POWER[a] < CARDS_POWER[b]:
+                return hand2
+        
+def gameLogicP2(inp: list) -> int:
+    score = 0
+    for i in inp:
+        won = 0
+        for j in inp:
+            if strongerHandP2(i.split(" ")[0], j.split(" ")[0]) == i.split(" ")[0]:
+                won += 1
+        score += int(i.split(" ")[1]) * (won + 1)
+    return score
+
+print(gameLogicP2(hands))
